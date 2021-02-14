@@ -15,14 +15,15 @@ let sliders = [];
 
 // here I am creating my own API
 
-const searchImages = () => {
+const getImages = () => {
     const searchText = document.getElementById("input-field").value;
     const KEY = '15674931-a9d714b6e9d654524df198e00&q';
     const url = `https://pixabay.com/api/?key=${KEY}=${searchText}&image_type=photo&pretty=true`
+    togglespinner();
     fetch(url)
         .then((res) => res.json())
         .then((data) => showImages(data.hits))
-
+        .catch(err => console.log(err));
 }
 var inputField = document.getElementById("input-field");
 inputField.addEventListener("keypress", function(event) {
@@ -34,7 +35,6 @@ inputField.addEventListener("keypress", function(event) {
 
 // show images 
 const showImages = (images) => {
-    console.log(images);
     imagesArea.style.display = 'block';
     gallery.innerHTML = '';
     // show gallery title
@@ -43,17 +43,11 @@ const showImages = (images) => {
         let div = document.createElement('div');
         div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
         div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
-        gallery.appendChild(div)
-    })
+        gallery.appendChild(div);
+        togglespinner();
+    });
 
-}
-
-const getImages = (query) => {
-    fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
-        .then(response => response.json())
-        .then(data => showImages(data.hitS))
-        .catch(err => console.log(err))
-}
+};
 
 let slideIndex = 0;
 const selectItem = (event, img) => {
@@ -66,7 +60,7 @@ const selectItem = (event, img) => {
         alert('Hey, Already added !')
     }
 }
-var timer
+var timer;
 const createSlider = () => {
     // check slider image length
     if (sliders.length < 2) {
@@ -87,19 +81,24 @@ const createSlider = () => {
     // hide image aria
     imagesArea.style.display = 'none';
     const duration = document.getElementById('duration').value || 1000;
-    sliders.forEach(slide => {
-        let item = document.createElement('div')
-        item.className = "slider-item";
-        item.innerHTML = `<img class="w-100"
-    src="${slide}"
-    alt="">`;
-        sliderContainer.appendChild(item)
-    })
-    changeSlide(0)
-    timer = setInterval(function() {
-        slideIndex++;
-        changeSlide(slideIndex);
-    }, duration);
+    if (duration < 0) {
+        alert("you can not enter here any negative value.")
+    } else {
+        sliders.forEach(slide => {
+            let item = document.createElement('div')
+            item.className = "slider-item";
+            item.innerHTML = `<img class="w-100"
+        src="${slide}"
+        alt="">`;
+            sliderContainer.appendChild(item)
+        })
+        changeSlide(0)
+        timer = setInterval(function() {
+            slideIndex++;
+            changeSlide(slideIndex);
+        }, duration);
+    }
+
 }
 
 // change slider index 
@@ -131,7 +130,7 @@ const changeSlide = (index) => {
 searchBtn.addEventListener('click', function() {
     document.querySelector('.main').style.display = 'none';
     clearInterval(timer);
-    const search = document.getElementById('search');
+    const search = document.getElementById('search-btn');
     getImages(search.value)
     sliders.length = 0;
 })
@@ -139,3 +138,8 @@ searchBtn.addEventListener('click', function() {
 sliderBtn.addEventListener('click', function() {
     createSlider()
 })
+
+const togglespinner = () => {
+    const spinner = document.getElementById("loading-spinner");
+    spinner.classList.toggle('d-none');
+}
