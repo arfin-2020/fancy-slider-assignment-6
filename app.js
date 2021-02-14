@@ -19,6 +19,7 @@ const getImages = () => {
     const searchText = document.getElementById("input-field").value;
     const KEY = '15674931-a9d714b6e9d654524df198e00&q';
     const url = `https://pixabay.com/api/?key=${KEY}=${searchText}&image_type=photo&pretty=true`
+    toggleSpinner(true);
     fetch(url)
         .then((res) => res.json())
         .then((data) => showImages(data.hits))
@@ -43,7 +44,7 @@ const showImages = (images) => {
         div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
         div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
         gallery.appendChild(div);
-
+        toggleSpinner(false);
     });
 
 };
@@ -51,14 +52,15 @@ const showImages = (images) => {
 let slideIndex = 0;
 const selectItem = (event, img) => {
     let element = event.target;
-    element.classList.add('added');
+    element.classList.toggle('added');
     let item = sliders.indexOf(img);
     if (item === -1) {
         sliders.push(img);
     } else {
-        alert('Hey, Already added !')
+        let deselect = item;
+        sliders.splice(deselect, 1);
     }
-}
+};
 var timer;
 const createSlider = () => {
     // check slider image length
@@ -81,7 +83,7 @@ const createSlider = () => {
     imagesArea.style.display = 'none';
     const duration = document.getElementById('duration').value || 1000;
     if (duration < 0) {
-        alert("you can not enter here any negative value.")
+        alert("you can't enter here any negative value.⚠️")
     } else {
         sliders.forEach(slide => {
             let item = document.createElement('div')
@@ -137,3 +139,12 @@ searchBtn.addEventListener('click', function() {
 sliderBtn.addEventListener('click', function() {
     createSlider()
 })
+
+const toggleSpinner = (show) => {
+    const spinner = document.getElementById("loading-spinner");
+    if (show) {
+        spinner.classList.remove('d-none');
+    } else {
+        spinner.classList.add('d-none');
+    }
+}
