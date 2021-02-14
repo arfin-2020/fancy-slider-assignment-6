@@ -42,7 +42,7 @@ img {
 }
 
 .img-thumbnail {
-    transition: ease all 0.5s;
+    transition: ease all 0.2s;
     border-width: 2px;
 }
 
